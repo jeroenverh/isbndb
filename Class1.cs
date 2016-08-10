@@ -2,7 +2,8 @@
  * Jordan Bleu
  * isbndb C# Library
  * CIS310
- * April 27, 2016
+ * Originally Written: April 27, 2016
+ * Version 2.0 - Updated August 9, 2016
 */
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,15 @@ namespace jordanbleu.isbndb
         private XmlDocument _response;
         private bool _found;
         private bool _online;
+
+        // properties for book information
+        private string _title;
+        private string _author;
+        private string _publisher;
+        private string _summary;
+        private string _isbn10;
+        private string _isbn13;
+        private string _edition;
         
         /// <summary>
         /// The Constructor will create the web request based on your information you provide in order to get the response as XML
@@ -56,26 +66,27 @@ namespace jordanbleu.isbndb
                 this.response = responseXml;
 
             }
-            catch (WebException) {
+            catch (WebException) { // This exception is thrown if we cannot connect
                 this.online = false;
                 this.found = false;
-            }
-            
-  
-            
-            
+            } 
 
+            // Use the returned XML document to set our properties
+            // The developer who implements this code will only be able to read these properties,
+            // not set them
+            _title = xmlReadTo("title");
+            _author = GetAuthor();
+            _publisher = xmlReadTo("publisher_name");
+            _summary = xmlReadTo("summary");
+            _isbn10 = xmlReadTo("isbn10");
+            _isbn13 = xmlReadTo("isbn13");
+            _edition = xmlReadTo("edition_info");
 
-
-         
         }
 
-        /// <summary>
-        /// Call this method to get the Title of your result
-        /// </summary>
-        /// <returns>The title as a string, or -- if nothing was found</returns>
-        public string GetTitle() {
-            if (this.found)
+        // xmlReadTo should only be used withing the lib
+        private string xmlReadTo(string desc) {
+            if (this.found && this.online)
             {
                 //take our saved xmldocument and convert it to a stream
                 StringReader str = new StringReader(this.ToString());
@@ -87,18 +98,50 @@ namespace jordanbleu.isbndb
                 XmlDocument x = this.response;
                 XmlReader xmlIn = XmlReader.Create(str, settings);
 
-                xmlIn.ReadToDescendant("title");
-
+                xmlIn.ReadToDescendant(desc);
 
                 return xmlIn.ReadElementContentAsString();
-            } else { return  "";}
+            }
+            else
+            {
+                return "";
+            }
+
         }
 
-        /// <summary>
-        /// Call this method to get the author of your result
-        /// </summary>
-        /// <returns>The author name as a string, or nothing if nothing was found</returns>
-        public string GetAuthor()
+
+
+        public string title {
+            get { return _title; }        
+        }
+
+        public string author {
+            get { return _author; }
+        }
+
+        public string publisher {
+            get { return _publisher; }
+        }
+
+        public string summary {
+            get { return _summary; }
+        }
+
+        public string isbn10 {
+            get { return _isbn10; }
+        }
+
+        public string isbn13 {
+            get { return _isbn13; }
+        }
+
+        public string edition {
+            get { return _edition; }
+        }
+
+
+        // Handles the author getting
+        private string GetAuthor()
         {
             if (this.found)
             {
@@ -111,9 +154,7 @@ namespace jordanbleu.isbndb
 
                 XmlDocument x = this.response;
                 XmlReader xmlIn = XmlReader.Create(str, settings);
-                
-                
-                
+
                 string ret = "";
 
                 //So for some reason, on certain books in the isbndb page, the author elements don't exist.  
@@ -143,122 +184,6 @@ namespace jordanbleu.isbndb
             else { return ""; }
         }
 
-
-        /// <summary>
-        /// Call this method to get the publisher of your result
-        /// </summary>
-        /// <returns>The Publisher name as a string, or nothing if not found</returns>
-        public string GetPublisher()
-        {
-            if (this.found)
-            {
-                //take our saved xmldocument and convert it to a stream
-                StringReader str = new StringReader(this.ToString());
-
-                XmlReaderSettings settings = new XmlReaderSettings();
-                settings.IgnoreComments = true;
-                settings.IgnoreWhitespace = true;
-
-                XmlDocument x = this.response;
-                XmlReader xmlIn = XmlReader.Create(str, settings);
-
-                xmlIn.ReadToDescendant("publisher_name");
-
-
-                return xmlIn.ReadElementContentAsString();
-             } else { return  "";}
-        }
-
-
-        /// <summary>
-        /// Call this method to get the summary of your result
-        /// </summary>
-        /// <returns>the summary as a string, or nothing if not found</returns>
-        public string GetSummary()
-        {
-            if (this.found)
-            {
-                //take our saved xmldocument and convert it to a stream
-                StringReader str = new StringReader(this.ToString());
-
-                XmlReaderSettings settings = new XmlReaderSettings();
-                settings.IgnoreComments = true;
-                settings.IgnoreWhitespace = true;
-
-                XmlDocument x = this.response;
-                XmlReader xmlIn = XmlReader.Create(str, settings);
-
-                xmlIn.ReadToDescendant("summary");
-
-
-                return xmlIn.ReadElementContentAsString();
-            } else { return  "";}
-        }
-
-        public string GetIsbn10()
-        {
-            if (this.found)
-            {
-                //take our saved xmldocument and convert it to a stream
-                StringReader str = new StringReader(this.ToString());
-
-                XmlReaderSettings settings = new XmlReaderSettings();
-                settings.IgnoreComments = true;
-                settings.IgnoreWhitespace = true;
-
-                XmlDocument x = this.response;
-                XmlReader xmlIn = XmlReader.Create(str, settings);
-
-                xmlIn.ReadToDescendant("isbn10");
-
-
-                return xmlIn.ReadElementContentAsString();
-             } else { return  "";}
-        }
-
-        public string GetIsbn13()
-        {
-            if (this.found)
-            {
-                //take our saved xmldocument and convert it to a stream
-                StringReader str = new StringReader(this.ToString());
-
-                XmlReaderSettings settings = new XmlReaderSettings();
-                settings.IgnoreComments = true;
-                settings.IgnoreWhitespace = true;
-
-                XmlDocument x = this.response;
-                XmlReader xmlIn = XmlReader.Create(str, settings);
-
-                xmlIn.ReadToDescendant("isbn13");
-
-
-                return xmlIn.ReadElementContentAsString();
-            } else { return  "";}
-        }
-
-
-        public string GetEdition()
-        {
-            if (this.found)
-            {
-                //take our saved xmldocument and convert it to a stream
-                StringReader str = new StringReader(this.ToString());
-
-                XmlReaderSettings settings = new XmlReaderSettings();
-                settings.IgnoreComments = true;
-                settings.IgnoreWhitespace = true;
-
-                XmlDocument x = this.response;
-                XmlReader xmlIn = XmlReader.Create(str, settings);
-
-                xmlIn.ReadToDescendant("edition_info");
-
-
-                return xmlIn.ReadElementContentAsString();
-            }
-            else { return ""; }
-        }
 
         #region properties
         public string apiKey{
@@ -296,7 +221,7 @@ namespace jordanbleu.isbndb
             set { _online = value; }
         }
 
-        public bool found { //this property is readonly
+        public bool found { 
             get {
 
                 bool ret; //if we are offline, then we didn't find the data
@@ -328,8 +253,6 @@ namespace jordanbleu.isbndb
                 return ret;
             }
 
-       
-            
             set { _found = value; }
 
         }
@@ -355,10 +278,10 @@ namespace jordanbleu.isbndb
             {
                 isbnRequest that = (isbnRequest)obj;
                 if (this.GetAuthor() == that.GetAuthor() &&
-                    this.GetIsbn10() == that.GetIsbn10() &&
-                    this.GetIsbn13() == that.GetIsbn13() &&
-                    this.GetPublisher() == that.GetPublisher() &&
-                    this.GetTitle() == that.GetTitle() &&
+                    this.isbn10 == that.isbn10 &&
+                    this.isbn13 == that.isbn13 &&
+                    this.publisher == that.publisher &&
+                    this.title == that.title &&
                     this.found == true &&
                     that.found== true)
                 {
