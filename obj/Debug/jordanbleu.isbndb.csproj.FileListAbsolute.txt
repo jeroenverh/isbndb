@@ -1,0 +1,4 @@
+C:\Users\Jordan\Documents\uwsp\cis\310\isbndb_lib\isbn_db_tester\jordanbleu.isbndb\bin\Debug\jordanbleu.isbndb.dll
+C:\Users\Jordan\Documents\uwsp\cis\310\isbndb_lib\isbn_db_tester\jordanbleu.isbndb\bin\Debug\jordanbleu.isbndb.pdb
+C:\Users\Jordan\Documents\uwsp\cis\310\isbndb_lib\isbn_db_tester\jordanbleu.isbndb\obj\Debug\jordanbleu.isbndb.dll
+C:\Users\Jordan\Documents\uwsp\cis\310\isbndb_lib\isbn_db_tester\jordanbleu.isbndb\obj\Debug\jordanbleu.isbndb.pdb
